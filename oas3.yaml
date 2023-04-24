@@ -2,7 +2,7 @@ info:
   title: PDBe  API
   version: 2.0.0
   description: >-
-    OpenAPI 3 description of the PDBe REST API service. PDBe’s API is a programmatic way to obtain 
+    OpenAPI 3 description of the PDBe REST API service. PDBe’s API is a programmatic way to obtain
     information from the PDB from underlying PDBe's Oracle and graph database.
 openapi: 3.0.1
 paths:
@@ -24,6 +24,140 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/uniprot_details'
+  '/compound/summary/{hetcode}.json':
+   get:
+      parameters:
+        - name: hetcode
+          description: 3 letter code of ligand
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Response includes summary information for a chemical component.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/compound_summary'
+        '501':
+          description: If endpoint is not implemented
+  '/compound/similarity/{hetcode}.json':
+    get:
+      parameters:
+        - name: hetcode
+          description: 3 letter code of ligand
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Response includes ligands similar to the ligand of interest. Stereoisomers, ligands with the same scaffold and ligands with similarity over 60% defined by PARITY method are returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/compound_similarity'
+        '501':
+          description: If endpoint is not implemented
+  '/structure/{hetcode}.json':
+    get:
+      parameters:
+        - name: hetcode
+          description: 3 letter code of ligand
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Response includes total structures count and  total uniprot accession count to which a given ligand is bound.It also returns list of pdb structures, reprenstative pdb structure, ec number, protein_class and ligand role for each uniprot accession
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/structure'
+        '501':
+          description: If endpoint is not implemented
+  '/interactions/{hetcode}.json':
+    get:
+      parameters:
+        - name: hetcode
+          description: 3 letter code of ligand
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Response includes total interactions for a given ligand. This call includes all instances of a given ligand bound to any pdb residue. For each pdb entry, one can find atom-level interaction details for ligand/protein residue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/interaction'
+        '501':
+          description: If endpoint is not implemented
+  '/interactions_overview/{hetcode}.json':
+    get:
+      parameters:
+        - name: hetcode
+          description: 3 letter code of ligand
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Response includes total interactions for a given ligand per atom per residue-type. For each residue-type, the call gives interaction strength, unique id of atoms of ligand and interacting residue. It also gives the distance between the two interacting atoms, interaction type and contact type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/interaction_overview'
+        '501':
+          description: If endpoint is not implemented
+  '/interactions_strength/{hetcode}.json':
+    get:
+      parameters:
+        - name: hetcode
+          description: 3 letter code of ligand
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Response includes total interactions for a given ligand per atom per residue-type. For each residue-type, the call gives interaction strength.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/interaction_strength'
+        '501':
+          description: If endpoint is not implemented
+
+  '/summary_count/{hetcode}.json':
+    get:
+      parameters:
+        - name: hetcode
+          description: 3 letter code of ligand
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Response includes total structures count and  total uniprot accession count to which a given ligand is bound.It also returns list of pdb structures, reprenstative pdb structure, ec number, protein_class and ligand role for each uniprot accession
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/summary_count'
+        '501':
+          description: If endpoint is not implemented
 servers:
   - url: 'https://www.ebi.ac.uk/pdbe/api/v2'
     description: PDBe API RESTful API service
@@ -118,9 +252,9 @@ components:
     detailed:
       type: object
       properties:
-        summary: 
+        summary:
           $ref: '#/components/schemas/summary_items'
-        chains: 
+        chains:
           $ref: '#/components/schemas/chains'
       required:
         - summary
@@ -128,7 +262,7 @@ components:
     overview:
       type: object
       properties:
-        summary: 
+        summary:
           $ref: '#/components/schemas/summary_items'
       required:
         - summary
@@ -257,14 +391,14 @@ components:
         confidence_version:
           type: string
           description: >
-            Version of confidence measure software used to calculate quality. 
+            Version of confidence measure software used to calculate quality.
             This is required for theoretical models.
           example: v1.0.2
         confidence_avg_local_score:
           type: number
           description: >
-            Average of the confidence measures in the range of [0,1] for QMEANDisCo 
-            and [0,100] for pLDDT. Please contact 3D-Beacons developers if other 
+            Average of the confidence measures in the range of [0,1] for QMEANDisCo
+            and [0,100] for pLDDT. Please contact 3D-Beacons developers if other
             estimates are to be added. This is required for theoretical models.
           example: 0.95
         oligomeric_state:
@@ -384,7 +518,7 @@ components:
                       template_sequence_identity:
                         type: number
                         description: >
-                          Sequence identity of the template with the 
+                          Sequence identity of the template with the
                           UniProt accession, in the range of [0,1]
                         example: 0.97
                       last_updated:
@@ -678,3 +812,508 @@ components:
         - end
         - modelCategory
         - modelType
+    compound_summary:
+      required: [name, formula,inchi,inchi_key]
+      type: object
+      properties:
+        name:
+            type: string
+            description: The name of the chemical component
+            example: ADENOSINE-5'-TRIPHOSPHATE
+        released:
+            type: boolean
+            description: A flag denoting if the hetcode is released or not
+            example: true
+        superseded_by:
+          type: string
+          description: A hetcode which superseeds the hetcode in query
+          example: "null"
+        formula:
+          type: string
+          description: The chemical formula of the component
+          example: C10 H16 N5 O13 P3
+        inchi:
+          type: string
+          description: The full INCHI of the component
+          example: "InChI=1S/C10H16N5O13P3/c11-8-5-9(13-2-12-8)15(3-14-5)10-7(17)6(16)4(26-10)1-25-30(21,22)28-31(23,24)27-29(18,19)20/h2-4,6-7,10,16-17H,1H2,(H,21,22)(H,23,24)(H2,11,12,13)(H2,18,19,20)/t4-,6-,7-,10-/m1/s1"
+        inchi_key:
+          type: string
+          description: INCHI Key of the component
+          example: "ZKHQWZAMYRWXGA-KQYNXXCUSA-N"
+        smiles:
+          type: array
+          description: The SMILES representation of the component (could be multiple)
+          items:
+            type: string
+          example: ["c1nc(c2c(n1)n(cn2)C3C(C(C(O3)COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O)O)N"]
+        ww_pdb_info:
+            type: object
+            description: An info object which provides details of the chemical component from wwPDB
+            properties:
+              defined_at:
+                type: string
+                description: The date the chemical component was defined in wwPDB
+                example: "1999-07-08 00:00:00"
+              modified:
+                type: string
+                description : The modified date of the chemical componenet in wwPDB
+                example: "2011-06-04 00:00:00"
+              modification_flag:
+                type: string
+                description: Y/N denoting the modification status of the chemical component in wwPDB
+                example: "N"
+                enum: ["Y","N"]
+              polymer_type:
+                type: string
+                description: This flag denotes if the chemical component is a polymer or non-polymer in wwPDB
+                example: "NON-POLYMER"
+              standard_parent:
+                type: string
+                description: The standard chemical component defined in wwPDB
+                example: "null"
+        functional_annotations:
+          type: array
+          items:
+              type: string
+          description: A list of functional annotations for the chemical component
+          enum: ["Drug-like","Co-factor-like","Reactant-like"]
+        cross-link:
+          type: object
+          description: Cross references for this chemical component from other resources
+          properties:
+            resource:
+              type: string
+              description: The external resource name
+              example: "BindingDb"
+            resource_id:
+              type: string
+              description: The external resource id
+              example: "50366480"
+        synonyms:
+          type: object
+          description: A list of synomyms for the chemical component from other sources
+          properties:
+            origin:
+              type: string
+              description: The resource which provides synonym for the chemical component
+              example: "DrugBank"
+            value:
+              type: string
+              description: The synonym provided by the resource
+              example: "Striadyne"
+        phys_chem_properties:
+          type: object
+          description: An object of physical chemical properties
+          properties:
+            crippen_mr:
+              type: number
+              description: Wildman-Crippen molar refractivity is a common descriptor accounting for molecular size and polarizability
+              example: 92.446
+            num_atom_stereo_centers:
+              type: integer
+              description: Number of atoms with four attachments different from each other
+              example: 6
+            crippen_clog_p:
+              type: number
+              description: Octanol/Water partition coeficient predicted using Wildman-Crippen method
+              example: -2.438
+            num_rings:
+              type: integer
+              description: Number of rings
+              example: 3
+            num_rotatable_bonds:
+              type: integer
+              description: Number of single bonds, not part of a ring bound to a nonterminal heavy atom
+              example: 15
+            num_heteroatoms:
+              type: integer
+              description: Number of non oxygen and non carbon atoms
+            fraction_csp3:
+              type: number
+              description: Fraction of C atoms that are SP3 hybridized
+              example: 5.9
+            num_aromatic_rings:
+              type: integer
+              description: Number of aromatic rings for the molecule
+              example: 2
+            exactmw:
+              type: number
+              description: Total mass of the molecule
+              example: 506.996
+            num_spiro_atoms:
+              type: integer
+              description: Atoms shared between rings that share exactly one atom
+              example: 0
+            num_heavy_atoms:
+              type: integer
+              description: Number of non hydrogen atoms
+              example: 31
+            num_aliphatic_rings:
+              type: integer
+              description: Niumber of aliphatic rings
+              example: 1
+            num_hbd:
+              type: integer
+              description: Number of hydrogen bond donors
+              example: 7
+            num_saturated_heterocycles:
+              type: integer
+              description: Number of saturated heterocycles
+              example: 1
+            tpsa:
+              type: number
+              description: Topological surface area
+              example: 279.13
+            num_bridgehead_atoms:
+              type: integer
+              description: Number of atoms shared between rings that share at least two bonds
+              example: 0
+            num_aromatic_heterocycles:
+              type: integer
+              description: Number or aromatic rings with at least two different elements
+              example: 2
+            labute_asa:
+              type: number
+              description: Accessible surface area accorging to the Labute' definition
+              example: 194.334
+            num_hba:
+              type: integer
+              description: Number of hydrogen bond acceptors
+              example: 18
+            num_amide_bonds:
+              type: integer
+              description: Number of amide bonds
+              example: 0
+            num_saturated_rings:
+              type: integer
+              description: Number of saturated rings
+              example: 1
+            lipinski_hba:
+              type: number
+              description: Number of hydrogen bond acceptors according to Lipinsky definition
+              example: 18
+            num_unspec_atom_stereo_centers:
+              type: integer
+              description: Number of unsuspected stereocenters
+            lipinski_hbd:
+              type: number
+              description: Number of hydrogen bond donors according to Lipinsky definition
+              example: 8
+            num_heterocycles:
+              type: integer
+              description: Number or rings with at least two different elements
+              example: 3
+            num_aliphatic_heterocycles:
+              type: integer
+              description: Number of aliphatic heterocycles
+              example: 1
+
+    compound_similarity:
+      type: object
+      properties:
+        stereoisomers:
+          description: A list of stereoisomer hetcode objects
+          type: array
+          items:
+            type: object
+            properties :
+              chem_comp_id:
+                type: string
+                description: Chemical component identifier, the so-called 3-letter code, but it need not be 3-letter long!
+                example: "GL0"
+              name:
+                type: string
+                description: A name for the hetcode
+                example: beta-D-gulopyranose
+        same_scaffold:
+          type: array
+          description : A list of hetcode objects which is part of the same scaffold
+          items:
+            type: object
+            properties:
+              chem_comp_id:
+                type: string
+                description: Chemical component identifier, the so-called 3-letter code, but it need not be 3-letter long!
+                example: "9YW"
+              name:
+                type: string
+                description: A name for the hetcode
+                example: "(alpha-D-glucopyranosyloxy)acetic acid"
+              substructure_match:
+                type: array
+                items:
+                  type: string
+                description: A list of atom names in the hetcode that match with the hetcode in the query
+                example: ["C1","C4","O5","C2","C3","C5"]
+              similarity_score:
+                type: number
+                description: Similarity score in the range of 0 to 1 defined by the PARITY method.
+                example: 0.75
+
+
+    structure:
+      required: [total_pdb_structures, total_unp_proteins]
+      type: object
+      properties:
+        total_pdb_structures:
+            type: integer
+            description: Total number of PDB structures to which given ligand is bound
+            example: 2400
+        total_unp_proteins:
+          type: integer
+          description: Total number of unique proteins (UniProt accession) to which a given ligand is bound
+          example: 1050
+        bound_data:
+          type: array
+          required: [pdb_entries,representative_structure]
+          items:
+            type: object
+            properties:
+              uniprot_accession:
+                description: UniProt accession number (AC)
+                type: string
+                example: D6D1V7
+              protein_name:
+                description: Name of the protein for the given uniprot accession
+                type: string
+                example: Glycosyl hydrolase family 71
+              ligand_role:
+                description: Functional role of ligand
+                type: array
+                items:
+                  type: string
+                  enum: ["reactant","cofactor","drug-like","unknown"]
+              pdb_entries:
+                description: list of PDB structures corresponding to the protein (uniprot accession) to which a ligand bound
+                type: array
+                example: [4ad4,6far,5lyr,6hmh,4ad4,4v28,4ad5,6fam,6fwp]
+                items:
+                  type: string
+
+              representative_structure:
+                description: Best representative structure. This is the structure with best (lowest) resolution with all/maximum number of ligand atoms resolved.
+                type: string
+                example: 6fwp
+              ec_number:
+                description: The Enzyme Commission Number based on the chemical reactions an enzyme catalyze.
+                type: array
+                example: ["3.2.1.130", "3.2.1.198"]
+                items:
+                  type: string
+              enzyme_class:
+                description: The Enzyme class name based on the chemical reactions an enzyme catalyze.
+                type: string
+                example: hydrolases
+                enum: [oxidoreductases, transferases, hydrolases, lyases, isomerases, ligases, and translocases]
+    interaction:
+      type: object
+      properties:
+        total_interactions:
+          type: integer
+        interaction_data:
+          type: array
+          items:
+              type: object
+              properties:
+                pdb_id:
+                  type: string
+                interacting_protein_residues:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      entity_id:
+                        type: integer
+                      chain_id:
+                          type: string
+                      residue_number:
+                        type: integer
+                      author_residue_number:
+                        type: integer
+                      author_insertion_code:
+                        type: string
+                      chem_comp_id:
+                        type: string
+                      uniprot_accession:
+                        type: string
+                      interacting_ligand_details:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            entity_id:
+                                type: integer
+                            chain_id:
+                              type: string
+                            residue_number:
+                                type: integer
+                            author_residue_number:
+                              type: integer
+                            author_insertion_code:
+                              type: string
+                            chem_comp_id:
+                              type: string
+                            atom_details:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    ligand_atom:
+                                      type: string
+                                    protein_residue_atom:
+                                      type: string
+                                    interaction_type:
+                                      type: string
+                                    distance:
+                                      type: number
+
+    interaction_overview:
+      type: object
+      properties:
+        ligand_atom:
+          description: Ligand atom name which is interacting with the target. This target is a polymer and can be either nucleic acid or protein.
+          type: string
+          example: C1
+        interacting_target_residue:
+            description: Details of all the target residue which are interacting with the given ligand atom
+            type: array
+            items:
+              type: object
+              properties:
+                target_residue_name:
+                  description: Name of target residue which is interacting with the given ligand atom
+                  type: string
+                  example: ARG
+                  enum: [ALA, ARG, ASN, ASP, CYS, GLU, GLN, GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SER, THR, TRP, TYR, VAL, DA, DT, DG, DC, A, G, C, U, DU]
+                interaction_strength:
+                  type: number
+                  example: 2.1
+                details:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      target_uniqid:
+                        description: Target unique ID which is pdbid, entitiy_id and residue_number seperated by underscore.
+                        type: string
+                        example: 7esb_1_242
+                      interactions:
+                        type: object
+                        description: Details of interactions.
+                        properties:
+                            target_residue_atom_name:
+                              description: Atom name of the interacting target residue
+                              type: string
+                              example: O1G
+                            ligand_uniq_id:
+                              description: Ligand unique ID which is pdbid, entitiy_id, ?, and ? seperated by underscore.
+                              type: string
+                              example: 7esb_2_B_1
+                            distance:
+                              description: Distance between the two interacting atoms of ligand and target
+                              type: number
+                              example: 3.49
+                            interaction_type:
+                              description: Interaction type as given by Arpeggio.
+                              type: array
+                              example: ["polar","hbond","vdw_clash"]
+                              items:
+                                type: string
+                                enum: ["polar","hbond","vdw_clash","vdw","weak_hbond","carbonpi","cationpi","weak_polar","aromatic"]
+
+    interaction_strength:
+      type: object
+      properties:
+        ligand_atom:
+          description: Ligand atom name which is interacting with the target. This target is a polymer and can be either nucleic acid or protein.
+          type: string
+          example: C1
+        interacting_target_residue:
+            description: Details of all the target residue which are interacting with the given ligand atom
+            type: array
+            items:
+              type: object
+              properties:
+                target_residue_name:
+                  description: Name of target residue which is interacting with the given ligand atom
+                  type: string
+                  example: ARG
+                  enum: [ALA, ARG, ASN, ASP, CYS, GLU, GLN, GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SER, THR, TRP, TYR, VAL, DA, DT, DG, DC, A, G, C, U, DU]
+                interaction_strength:
+                  type: number
+                  example: 2.1
+                interaction_count:
+                  type: number
+                  example: 2500
+                interactions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      interaction_type:
+                        description: Interaction type as given by Arpeggio.
+                        type: string
+                        example: polar
+                        enum: ["polar","hbond","vdw_clash","vdw","weak_hbond","carbonpi","cationpi","weak_polar","aromatic"]
+                      interaction_count:
+                        type: integer
+                        example: 1500
+                      interaction_strength:
+                        type: number
+                        example: 1.5
+                      target_uniqid:
+                        description: Target unique ID which is pdbid, entitiy_id, residue_number and residue_atom_name seperated by underscore.
+                        type: array
+                        example: [7esb_1_242_OG1, 7esb_1_300_C1, 1cbs_2_240_N1]
+                        items:
+                          type: string
+
+    summary_count:
+      required: [total_pdb_structures, total_unp_proteins]
+      type: object
+      properties:
+        total_pdb_structures:
+            type: integer
+            description: Total number of PDB structures to which given ligand is bound
+            example: 2400
+        total_unp_proteins:
+          type: integer
+          description: Total number of unique proteins (UniProt accession) to which a given ligand is bound
+          example: 1050
+        bound_data:
+          type: array
+          required: [pdb_entries,representative_structure]
+          items:
+            type: object
+            properties:
+              uniprot_accession:
+                description: UniProt accession number (AC)
+                type: string
+                example: D6D1V7
+              protein_name:
+                description: Name of the protein for the given uniprot accession
+                type: string
+                example: Glycosyl hydrolase family 71
+              ligand_role:
+                description: Functional role of ligand
+                type: array
+                items:
+                  type: string
+                  enum: ["reactant","cofactor","drug-like","unknown"]
+              pdb_entries:
+                description: list of PDB structures corresponding to the protein (uniprot accession) to which a ligand bound
+                type: array
+                example: [4ad4,6far,5lyr,6hmh,4ad4,4v28,4ad5,6fam,6fwp]
+                items:
+                  type: string
+
+              representative_structure:
+                description: Best representative structure. This is the structure with best (lowest) resolution with all/maximum number of ligand atoms resolved.
+                type: string
+                example: 6fwp
+              ec_number:
+                description: The Enzyme Commission Number based on the chemical reactions an enzyme catalyze.
+                type: array
+                example: ["3.2.1.130", "3.2.1.198"]
+                items:
+                  type: string
