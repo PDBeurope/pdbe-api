@@ -158,6 +158,105 @@ paths:
                 $ref: '#/components/schemas/summary_count'
         '501':
           description: If endpoint is not implemented
+
+  '/pdbe/api/pisa/assembly/{pdbid}/{assemblyid}':
+    get:
+      summary: Assembly data per PDB assembly id
+      description: "Returns a list of assemblies."
+      parameters:
+        - name: pdbid
+          description: A PDB identifier
+          example: '1cbs'
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: assemblyid
+          description: An assembly identifier
+          example: '1'
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: | 
+            This is an example of what an annotations data exchange JSON 
+            would look like
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assembly'
+        '400':
+          description: bad input parameter
+  '/pdbe/api/pisa/interfaces/{pdbid}/{assemblyid}':
+    get:
+      summary: Interaction interface data per PDB assembly id
+      description: "Returns details of the interface for given pdbid and assembly id."
+      parameters:
+        - name: pdbid
+          description: A PDB identifier
+          example: '1cbs'
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: assemblyid
+          description: An assembly identifier
+          example: '1'
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: | 
+            This is an example of what an annotations data exchange JSON 
+            would look like
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PISA_interfaces'
+        '400':
+          description: bad input parameter
+  '/pdbe/api/pisa/interface/{pdbid}/{assemblyid}/{interfaceid}':
+    get:
+      summary: Interaction interface data per PDB assembly id
+      description: "Returns details of as single interface for given pdbid and assembly id."
+      parameters:
+        - name: pdbid
+          description: A PDB identifier
+          example: '1cbs'
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: assemblyid
+          description: An assembly identifier
+          example: '1'
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: interfaceid
+          description: An interface identifier
+          example: '1'
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: | 
+            This is an example of what an annotations data exchange JSON 
+            would look like
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interface'
+        '400':
+          description: bad input parameter
+
 servers:
   - url: 'https://www.ebi.ac.uk/pdbe/api/v2'
     description: PDBe API RESTful API service
@@ -1317,3 +1416,416 @@ components:
                 example: ["3.2.1.130", "3.2.1.198"]
                 items:
                   type: string
+
+    PISA_interfaces:
+      title: pisa
+      type: object
+      properties:
+        pdb_id:
+          title: PDB_id
+          type: object
+          properties:
+            assembly_id:
+              type: string
+              example: "1"
+              description: "Assembly identifier"
+            pisa_version:
+              type: string
+              example: "2.0.0"
+              description: "The semantic version number of PISA"
+            assembly:
+              title: Assembly
+              type: object
+              properties:
+                mmsize:
+                  type: integer
+                  example: 2
+                  description: "Size of the assembly"
+                dissociation_energy:
+                  type: number
+                  example: 15.61
+                  description: "[Maximal free energy of dissociation  (kcal/mol)]"
+                accessible_surface_area:
+                  type: number
+                  example: 19395.3
+                  description: "[Accessible surface area  (A^2)]"
+                buried_surface_area:
+                  type: number
+                  example: 31514.17
+                  description: "[Buried surface area (A^2)]"
+                entropy:
+                  type: number
+                  example: 12.98
+                  description: "[Entropy change at dissociation ]"
+                dissociation_area:
+                  type: number
+                  example: 1427.5
+                  description: "[Dissociation Interface Area (A^2)]"
+                solvation_energy_gain:
+                  type: number
+                  example: -35.28
+                  description: "[Solvation energy gain (Kcal/mol)]"
+                formula:
+                  type: string
+                  example: A(2)a(2)b(2)
+                  description: "[Formula]"
+                composition:
+                  type: string
+                  example: AAA[NA](2)[GOL](2)
+                  description: "[Composition]"
+                interface_count:
+                  type: integer
+                  example: 1
+                  description: "[Number of interfaces]"
+                interfaces:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Interface'
+    Bonds:
+      title: Bonds
+      type: object
+      properties:
+        bond_distances:
+          type: array
+          items:
+            type: number
+            example: 2.90
+            description: "[Bond distance (A)]"
+        atom_site_1_chains:
+          type: array
+          items:
+            type: string
+            example: "A"
+            description: "Author chain identifier"
+        atom_site_1_residues:
+          type: array
+          items:
+            type: string
+            example: "ASN"
+            description: "Three-letter code"
+        atom_site_1_label_asym_ids:
+          type: array
+          items:
+            type: string
+            example: "A"
+            description: "Asym chain identifier"
+        atom_site_1_orig_label_asym_ids:
+          type: array
+          items:
+            type: string
+            example: "A"
+            description: "Asym chain identifier in the original model file"
+        atom_site_1_upn_accs:
+          type: array
+          items:
+            type: string
+            example: "P48491"
+            description: "Uniprot accession numbers"
+        atom_site_1_upn_nums:
+          type: array
+          items:
+            type: string
+            example: "2"
+            description: "Sequence position of the UniProt entry that corresponds to the residue mapping"
+        atom_site_1_seq_nums: 
+          type: array
+          items:
+            type: integer
+            example: 2
+            description: "Author atom sequence identifier"
+        atom_site_1_label_seq_ids:
+          type: array
+          items:
+            type: integer
+            example: 5
+            description: "[sequence number atom 1 (label)]"
+        atom_site_1_label_atom_ids:
+          type: array
+          items:
+            type: string
+            example: "CA"
+            description: "Atom name"
+        atom_site_1_inscodes:
+          type: array
+          items:
+            type: string
+            example: "1"
+            description: "Atom insertion code"
+        atom_site_2_chains:
+          type: array
+          items:
+            type: string
+            example: "A"
+            description: "Author chain identifier"
+        atom_site_2_residues:
+          type: array
+          items:
+            type: string
+            example: "ASN"
+            description: "Three-letter code"
+        atom_site_2_label_asym_ids:
+          type: array
+          items:
+            type: string
+            example: "A"
+            description: "Asym chain identifier"
+        atom_site_2_orig_label_asym_ids:
+          type: array
+          items:
+            type: string
+            example: "A"
+            description: "Asym chain identifier in the original model file"
+        atom_site_2_upn_accs:
+          type: array
+          items:
+            type: string
+            example: "P48491"
+            description: "Uniprot accession numbers"
+        atom_site_2_upn_nums:
+          type: array
+          items:
+            type: string
+            example: "2"
+            description: "Sequence position of the UniProt entry that corresponds to the residue mapping"      
+        atom_site_2_seq_nums: 
+          type: array
+          items:
+            type: integer
+            example: 2
+            description: "Author atom sequence identifier"
+        atom_site_2_label_seq_ids:
+          type: array
+          items:
+            type: integer
+            example: 5
+            description: "[sequence number atom 1 (label)]"
+        atom_site_2_label_atom_ids:
+          type: array
+          items:
+            type: string
+            example: "CA"
+            description: "Atom name"
+        atom_site_2_inscodes:
+          type: array
+          items:
+            type: string
+            example: "1"
+            description: "Atom insertion code"
+    Interface:
+      title: Interface
+      type: object
+      properties:
+        interface_id:
+          type: integer
+          example: 1
+          description: "Interface identifier"
+        interface_area:
+          type: number
+          example: 1427.5
+          description: "[Area of interface  (A^2)]"
+        solvation_energy:
+          type: number
+          example: -18.22
+          description: "[Solvation energy (kcal/mol)]"
+        stabilization_energy:
+          type: number
+          example: -28.59
+          description: "[Stabilisation energy (Kcal/mol)]"
+        p_value:
+          type: number
+          example: 0.095
+          description: "[Probability that solvation energy gain for interface atom may be greater than binding energy]"
+        number_interface_residues:
+          type: integer
+          example: 1
+          description: "Number of interface residues"  
+        number_hydrogen_bonds:
+          type: integer
+          example: 1
+          description: "Number of interface hydrogen bonds"
+        number_salt_bridges:
+          type: integer
+          example: 1
+          description: "Number of interface salt bridges"
+        number_covalent_bonds:
+          type: integer
+          example: 1
+          description: "Number of interface covalent bonds"
+        number_disulfide_bonds:
+          type: integer
+          example: 1
+          description: "Number of interface disulfide bonds"
+        number_other_bonds:
+          type: integer
+          example: 1
+          description: "Number of other contacts within a distance of 4 A and not classified as any of the other bonds "
+        hydrogen_bonds:
+          $ref: '#/components/schemas/Bonds' 
+        salt_bridges:
+          $ref: '#/components/schemas/Bonds' 
+        disulfide_bonds:
+          $ref: '#/components/schemas/Bonds'
+        covalent_bonds:
+          $ref: '#/components/schemas/Bonds' 
+        other_bonds:
+          $ref: '#/components/schemas/Bonds' 
+        molecules:
+          type: array
+          items:
+            type: object
+            properties:
+              molecule_id:
+                type: string
+                example: "1"
+                description: "Identifier of the molecule on the interface"
+              molecule_class:
+                type: string
+                example: "Protein"
+                description: "Molecule type/class"
+                enum: [
+                  "Protein",
+                  "Ligand",
+                  "RNA",
+                  "DNA"
+                  ]
+              chain_id:
+                type: string
+                example: "A"
+                description: "PDB chain identifier of the molecule"
+              residue_label_comp_ids:
+                type: array
+                items:
+                  type: string
+                  example: "CYS"
+                  description: "Residue label"
+              residue_seq_ids:
+                type: array
+                items:
+                  type: string
+                  example: "1"
+                  description: "Sequence number"
+              residue_label_seq_ids:
+                type: array
+                items:
+                  type: string
+                  example: "1"
+                  description: "Label sequence number"
+              residue_ins_codes:
+                type: array
+                items:
+                  type: string
+                  example: "1"
+                  description: "Insertion codes"
+              residue_bonds:
+                type: array
+                items:
+                  type: string
+                  example: "1"
+                  description: "Residue bonds"
+              solvation_energies:
+                type: array
+                items:
+                  type: number
+                  example: 0.01
+                  description: "Solvation energy effect (kcal/mol)"
+              accessible_surface_areas:
+                type: array
+                items:
+                  type: number
+                  example: 1.12
+                  description: "Accessible surface area (A^2)"
+              buried_surface_areas:
+                type: array
+                items:
+                  type: number
+                  example: 0.46
+                  description: "Buried surface area  (A^2)"
+    Assembly:
+      title: assembly
+      type: object
+      description: "A PDB identifier in lower case"
+      properties:
+        pdb_id:
+          title: PDB_entry
+          type: object
+          properties:
+            assembly_id:
+              type: string
+              example: "1"
+              description: "Assembly identifier"
+            pisa_version:
+              type: string
+              example: "2.0.0"
+              description: "The semantic version number of PISA"
+            assembly:
+              title: Assembly
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "1"
+                  description: "Assembly identifier"
+                size:
+                  type: integer
+                  example: 6
+                  description: "Size of the assembly"     
+                interface_count:
+                  type: integer
+                  example: 1
+                  description: "[Number of interfaces]"
+                score:
+                  type: string
+                  example: "2"
+                  description: "Macromolecular size of the assembly"
+                macromolecular_size:
+                  type: integer
+                  example: 2
+                  description: "Macromolecular size of the assembly"
+                dissociation_energy:
+                  type: number
+                  example: 15.61
+                  description: "[Maximal free energy of dissociation  (kcal/mol)]"
+                accessible_surface_area:
+                  type: number
+                  example: 19395.3
+                  description: "[Accessible surface area  (A^2)]"
+                buried_surface_area:
+                  type: number
+                  example: 31514.17
+                  description: "[Buried surface area (A^2)]"
+                entropy:
+                  type: number
+                  example: 12.98
+                  description: "[Entropy change at dissociation ]"
+                dissociation_area:
+                  type: number
+                  example: 1427.5
+                  description: "[Dissociation Interface Area (A^2)]"
+                solvation_energy_gain:
+                  type: number
+                  example: -35.28
+                  description: "[Solvation energy gain (Kcal/mol)]"
+                number_of_uc:
+                  type: integer
+                  example: 1
+                  description: "number of assemblies in unit cells"
+                number_of_dissociated_elements:
+                  type: integer
+                  example: 2
+                  description: "Number of dissociating parts"
+                symmetry_number:
+                  type: integer
+                  example: 2
+                  description: "Symmetry number"
+                formula:
+                  type: string
+                  example: A(2)a(2)b(2)
+                  description: "[Formula]"
+                composition:
+                  type: string
+                  example: AAA[NA](2)[GOL](2)
+                  description: "[Composition]"
+                R350:
+                  type: integer
+                  example: 1
+                  description: "Remark R350"
