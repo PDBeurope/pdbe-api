@@ -159,7 +159,7 @@ paths:
         '501':
           description: If endpoint is not implemented
 
-  '/pdbe/api/pisa/assembly/{pdbid}/{assemblyid}':
+  '/pisa/assembly/{pdbid}/{assemblyid}':
     get:
       summary: Assembly data per PDB assembly id
       description: "Returns a list of assemblies."
@@ -189,7 +189,7 @@ paths:
                 $ref: '#/components/schemas/Assembly'
         '400':
           description: bad input parameter
-  '/pdbe/api/pisa/interfaces/{pdbid}/{assemblyid}':
+  '/pisa/interfaces/{pdbid}/{assemblyid}':
     get:
       summary: Interaction interface data per PDB assembly id
       description: "Returns details of the interface for given pdbid and assembly id."
@@ -219,7 +219,7 @@ paths:
                 $ref: '#/components/schemas/PISA_interfaces'
         '400':
           description: bad input parameter
-  '/pdbe/api/pisa/interface/{pdbid}/{assemblyid}/{interfaceid}':
+  '/pisa/interface/{pdbid}/{assemblyid}/{interfaceid}':
     get:
       summary: Interaction interface data per PDB assembly id
       description: "Returns details of as single interface for given pdbid and assembly id."
